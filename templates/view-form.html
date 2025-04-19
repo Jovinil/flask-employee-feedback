@@ -1,0 +1,115 @@
+{% extends 'base.html' %}
+
+{% block header %}
+  <h1>{% block title %}Dashboard{% endblock %}</h1>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <form method="POST">
+        <div class="row">
+            <div class="col">
+                <section class="card">
+                    <header class="card-header">
+                        <div class="card-actions">
+                            <a href="#" class="card-action card-action-toggle" data-card-toggle=""></a>
+                            <a href="#" class="card-action card-action-dismiss" data-card-dismiss=""></a>
+                        </div>
+
+                        <h2 class="card-title">Employee Feedback Form</h2>
+                    </header>
+                    <div class="card-body">
+                      <div class="row mb-3">
+                          <div class="col-md-4">
+                              <label for="surname" class="form-label">Surname</label>
+                              <input type="text" class="form-control" id="surname" name="surname" required>
+                          </div>
+                          <div class="col-md-4">
+                              <label for="first-name" class="form-label">First Name</label>
+                              <input type="text" class="form-control" id="first-name" name="first_name" required>
+                          </div>
+                          <div class="col-md-4">
+                              <label for="middle-name" class="form-label">Middle Name</label>
+                              <input type="text" class="form-control" id="middle-name" name="middle_name">
+                          </div>
+                      </div>
+                      <div class="row mb-3">
+                          <div class="col-md-6">
+                              <label for="division" class="form-label">Unit/Division</label>
+                              <select class="form-select" id="division" name="division" required>
+                                  <option value="CICT">CICT</option>
+                                  <option value="CBA">CBA</option>
+                              </select>
+                          </div>
+                          <div class="col-md-6">
+                              <label for="quarter" class="form-label">Quarter</label>
+                              <select class="form-select" id="quarter" name="quarter" required>
+                                  <option value="1">1st</option>
+                                  <option value="2">2nd</option>
+                                  <option value="3">3rd</option>
+                                  <option value="4">4th</option>
+                              </select>
+                          </div>
+                      </div>
+
+                      <hr class="fancy-hr" style=" border: none;
+                      height: 2px;
+                      background: linear-gradient(to right, #043a41, #096970); /* Gradient line */
+                      margin: 20px 0;">
+
+                      <div class="row mb-3">
+                        <h4 class="mb-3 fw-bold">Critical Incedents Noted</h4>
+                        <div class="col-md-12 mb-2">
+                            <label class="form-label" for="textareaAutosize">Gist <span class="text-muted">(What, Where & How it happened)</span></label>
+                              <textarea class="form-control" rows="3" id="textareaAutosize" data-plugin-textarea-autosize="" style="overflow: hidden; overflow-wrap: break-word; resize: none; text-align: start; height: 391px;"></textarea>
+                        </div>
+                        <div class="col-md-12">
+                            <label class="form-label">Date</label>
+                            <div class="input-group">
+                              <span class="input-group-text">
+                                <i class="fas fa-calendar-alt"></i>
+                              </span>
+                              <input type="text" data-plugin-datepicker="" class="form-control">
+                            </div>
+                        </div>
+                      </div>
+
+                      <hr class="fancy-hr" style=" border: none;
+                      height: 2px;
+                      background: linear-gradient(to right, #043a41, #096970); /* Gradient line */
+                      margin: 20px 0;">
+
+                      <div class="row mb-3">
+                        <h4 class="mb-3 fw-bold">Interventions</h4>
+                        <div class="col-md-12 mb-2">
+                            <label class="form-label" for="textareaAutosize">Recommended</label>
+                              <textarea class="form-control" rows="3" id="textareaAutosize" data-plugin-textarea-autosize="" style="overflow: hidden; overflow-wrap: break-word; resize: none; text-align: start; height: 391px;"></textarea>
+                        </div>
+                        <div class="col-md-12">
+                            <label class="form-label">Target Date</label>
+                            <div class="input-group">
+                              <span class="input-group-text">
+                                <i class="fas fa-calendar-alt"></i>
+                              </span>
+                              <input type="text" data-plugin-datepicker="" class="form-control">
+                            </div>
+                        </div>
+                      </div>
+
+                    </div>
+                </section>
+            </div>
+        </div>
+
+        <div class="row mt-4">
+            <div class="col">
+                <div class="text-end">
+                    <input type="submit" class="btn btn-primary">
+                </div>
+            </div>
+        </div>
+    </form>
+
+</div>
+
+{% endblock %}

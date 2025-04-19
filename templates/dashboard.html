@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+
+{% block header %}
+  <h1>{% block title %}Dashboard{% endblock %}</h1>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="col-12">
+        <section class="card">
+            <header class="card-header">
+                <div class="card-actions">
+                    <a href="#" class="card-action card-action-toggle" data-card-toggle=""></a>
+                    <a href="#" class="card-action card-action-dismiss" data-card-dismiss=""></a>
+                </div>
+
+                <h2 class="card-title">Feedback Form Log</h2>
+            </header>
+            <div class="card-body">
+                <table class="table table-responsive-md mb-0">
+                    <thead>
+                        <tr>
+                            <th>Full Name</th>
+                            <th>Division/Unit</th>
+                            <th>Quarter</th>
+                            <th>Date</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Joy V. Santellices</td>
+                            <td>CICT</td>
+                            <td>1</td>
+                            <th>12/12/12</th>
+                            <td class="actions text-end">
+                                <a href=""><i class="fas fa-pencil-alt"></i></a>
+                                <a href="" class="delete-row"><i class="far fa-trash-alt"></i></a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </div>
+</div>
+
+{% endblock %}
