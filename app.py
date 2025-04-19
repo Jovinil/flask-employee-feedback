@@ -8,8 +8,12 @@ import requests
 app = Flask(__name__)
 app.config['JWT_SECRET_KEY'] = 'supersecretkey'
 app.config['SECRET_KEY'] = 'anothersecretkey'
-jwt = JWTManager(app)
+app.secret_key = 'hypersecretkey'
 api = Api(app)
+jwt = JWTManager(app)
+
+# Initialize a set to store blacklisted tokens
+blacklist = set()
 
 # db.set_connection('neo4j://neo4j:password@:localhost:7687/')
 
@@ -37,6 +41,13 @@ class Login(Resource):
             return {'access_token': access_token}, 200
         return {'message': 'Invalid credentials'}, 401
     
+class Logout(Resource):
+    @jwt_required()
+    def get(self):
+        jti = get_jwt()['jti']  # Get the unique identifier of the JWT
+        blacklist.add(jti)  # Add the token to the blacklist
+        return {'message': 'Successfully logged out'}, 200
+
 class Dashboard(Resource):
     @jwt_required()
     def get(self):
@@ -49,8 +60,14 @@ class FeedbackForm(Resource):
         current_user = get_jwt_identity()
         return {'username': current_user}, 200
 
+@jwt.token_in_blocklist_loader
+def check_if_token_in_blacklist(jwt_header, jwt_payload):
+    jti = jwt_payload['jti']
+    return jti in blacklist
+
 api.add_resource(Register, '/register')
 api.add_resource(Login, '/login')
+api.add_resource(Logout, '/logout')  # Add the logout resource
 api.add_resource(Dashboard, '/dashboard')
 api.add_resource(FeedbackForm, '/feedback-form')
 

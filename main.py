@@ -13,7 +13,7 @@ AUTH_SERVER = 'http://127.0.0.1:4000'
 
 @client_app.route('/')
 def home():
-    return render_template('home.html')
+    return render_template('login.html')
 
 @client_app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -37,6 +37,15 @@ def login():
             return redirect(url_for('dashboard'))
         return jsonify(response.json()), response.status_code
     return render_template('login.html')
+
+@client_app.route('/logout')
+def logout():
+    token = session.get('token')
+    headers = {'Authorization': f'Bearer {token}'}
+    reponse = requests.get(f'{AUTH_SERVER}/logout', headers=headers)
+
+    session.pop('token', None)
+    return redirect(url_for('login'))
 
 @client_app.route('/dashboard')
 def dashboard():
