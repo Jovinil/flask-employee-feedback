@@ -1,6 +1,6 @@
 from flask import Flask, request, jsonify, session, render_template, redirect, url_for
 from flask_restful import Api, Resource
-from neomodel import StructuredNode, StringProperty, UniqueIdProperty, db
+from neomodel import StructuredNode, StringProperty, UniqueIdProperty, RelationshipTo,db
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
 import requests
@@ -8,7 +8,6 @@ import requests
 app = Flask(__name__)
 app.config['JWT_SECRET_KEY'] = 'supersecretkey'
 app.config['SECRET_KEY'] = 'anothersecretkey'
-app.secret_key = 'hypersecretkey'
 api = Api(app)
 jwt = JWTManager(app)
 
@@ -21,6 +20,21 @@ class User(StructuredNode):
     uid = UniqueIdProperty()
     username = StringProperty(unique=True, required=True)
     password = StringProperty(required=True)
+    gave_feedback = RelationshipTo('Feedback', 'GAVE_FEEDBACK')
+
+class Feedback(StructuredNode):
+    uid = UniqueIdProperty()
+    surname = StringProperty(required=True)
+    first_name = StringProperty(required=True)
+    middle_name = StringProperty(required=True)
+    unit = StringProperty(required=True)
+    quarter = StringProperty(required=True)
+    gist = StringProperty(required=True)
+    date = StringProperty(required=True)
+    recommended = StringProperty(required=True)
+    target_date = StringProperty(required=True)
+    date_created = StringProperty(required=True)
+
 
 class Register(Resource):
     def post(self):
