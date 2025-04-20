@@ -36,7 +36,7 @@
                             <th>{{ feedback['incident_date']}}</th>
                             <td class="actions text-end">
                                 <a href="{{ url_for('getFeedback', feedback_id=feedback['uid']) }}"><i class="fas fa-pencil-alt"></i></a>
-                                <a href="" class="delete-row"><i class="far fa-trash-alt"></i></a>
+                                <a href="{{ url_for('deleteFeedback', feedback_id=feedback['uid']) }}" class="delete-row"><i class="far fa-trash-alt"></i></a>
                             </td>
                         </tr>
                         {% endfor %}

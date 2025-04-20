@@ -178,6 +178,22 @@ class UpdateFeedback(Resource):
         
         return {'message': 'User  not found'}, 404
 
+class DeleteFeedback(Resource):
+    @jwt_required()
+    def get(self, feedback_id):
+        current_user = get_jwt_identity()
+        user = User.nodes.first_or_none(username=current_user)
+
+        if user:
+            feedback = Feedback.nodes.get_or_none(uid=feedback_id)
+
+            if feedback and feedback in user.gave_feedback.all():
+                feedback.delete()
+                return {'message': 'Feedback deleted successfully'}, 200
+            
+            return {'message': 'Feedback not found or does not belong to the user'}, 404
+        
+        return {'message': 'User  not found'}, 404
 
 @jwt.token_in_blocklist_loader
 def check_if_token_in_blacklist(jwt_header, jwt_payload):
@@ -192,6 +208,7 @@ api.add_resource(FeedbackForm, '/feedback-form')
 api.add_resource(AddFeedback, '/add-feedback')
 api.add_resource(GetFeedback, '/get-feedback/<feedback_id>')
 api.add_resource(UpdateFeedback, '/update-feedback/<feedback_id>')
+api.add_resource(DeleteFeedback, '/delete-feedback/<feedback_id>')
 
 
 if __name__ == '__main__':

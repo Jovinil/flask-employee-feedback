@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, session, render_template, redirect, url_for
+from flask import Flask, request, jsonify, session, render_template, redirect, url_for, flash
 from flask_restful import Api, Resource
 from neomodel import StructuredNode, StringProperty, UniqueIdProperty, db
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -34,10 +34,12 @@ def login():
         if response.status_code == 200:
             session['token'] = response.json().get('access_token')
             return redirect(url_for('dashboard'))
-        return jsonify(response.json()), response.status_code
+        flash('Incorrect Username or Password')
+        return redirect(url_for('login'))
+        # return jsonify(response.json()), response.status_code
     return render_template('login.html')
 
-@client_app.route('/logout')
+@client_app.route('/logout', methods=['POST', 'GET'])
 def logout():
     token = session.get('token')
     headers = {'Authorization': f'Bearer {token}'}
@@ -88,7 +90,9 @@ def addFeedback():
                 'date_created': now.strftime('%m/%d/%Y')}
         response = requests.post(f'{AUTH_SERVER}/add-feedback', headers=headers, json=data)
         if response.status_code == 201:
+            flash('Added feedback', 'success')
             return redirect(url_for('dashboard'))
+        flash('Error while adding feedback', 'danger')
         return redirect(url_for('feedbackForm'))
 
 @client_app.route('/get-feedback/<feedback_id>', methods=['POST', 'GET'])
@@ -121,8 +125,23 @@ def updateFeedback(feedback_id):
                 'target_date': request.form['target_date'],}
         response = requests.post(f'{AUTH_SERVER}/update-feedback/{feedback_id}', headers=headers, json=data)
         if response.status_code == 200:
+            flash('Updated feedback', 'success')
             return redirect(url_for('dashboard'))
+        flash('Error while updating feedback', 'danger')
         return redirect(url_for('getFeedback', feedback_id=feedback_id))
+    
+@client_app.route('/delete-feedback/<feedback_id>')
+def deleteFeedback(feedback_id):
+    token = session.get('token')
+    if not token:
+        return redirect(url_for('login'))
+    headers = {'Authorization': f'Bearer {token}'}
+    response = requests.get(f'{AUTH_SERVER}/delete-feedback/{feedback_id}', headers=headers)
+    if response.status_code == 200:
+        flash('Deleted feedback', 'success')
+        return redirect(url_for('dashboard'))
+    flash('Erro while deleting feedback', 'danger')
+    return jsonify(response.json()), response.status_code
 
 if __name__ == '__main__':
     client_app.run(port=4001, debug=True)
