@@ -23,8 +23,18 @@
           <label for="password" class="form-label">Password</label>
           <input type="password" class="form-control" id="password" name="password" placeholder="Password" required>
         </div>
+
       
         <div>
+          {% with messages = get_flashed_messages() %}
+          {% if messages %}
+          <!-- <ul class=flashes> -->
+          {% for message in messages %}
+          <p class="text-danger m-1 text-center">{{ message }}</p>
+  
+          {% endfor %}
+          {% endif %}
+          {% endwith %}
           <p>Don't have an account? <a href="/register">Register here</a></p> 
         </div>
         <div class="text-end">
