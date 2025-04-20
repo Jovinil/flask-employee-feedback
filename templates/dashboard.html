@@ -28,16 +28,18 @@
                         </tr>
                     </thead>
                     <tbody>
+                        {% for feedback in feedbacks %}
                         <tr>
-                            <td>Joy V. Santellices</td>
-                            <td>CICT</td>
-                            <td>1</td>
-                            <th>12/12/12</th>
+                            <td>{{ feedback['first_name'] + " " + feedback['middle_name'] + " " + feedback['surname']}}</td>
+                            <td>{{ feedback['division']}}</td>
+                            <td>{{ feedback['quarter'] }}</td>
+                            <th>{{ feedback['incident_date']}}</th>
                             <td class="actions text-end">
-                                <a href=""><i class="fas fa-pencil-alt"></i></a>
+                                <a href="{{ url_for('getFeedback', feedback_id=feedback['uid']) }}"><i class="fas fa-pencil-alt"></i></a>
                                 <a href="" class="delete-row"><i class="far fa-trash-alt"></i></a>
                             </td>
                         </tr>
+                        {% endfor %}
                     </tbody>
                 </table>
             </div>

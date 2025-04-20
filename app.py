@@ -1,9 +1,8 @@
-from flask import Flask, request, jsonify, session, render_template, redirect, url_for
+from flask import Flask, request, jsonify
 from flask_restful import Api, Resource
-from neomodel import StructuredNode, StringProperty, UniqueIdProperty, RelationshipTo,db
+from neomodel import StructuredNode, StringProperty, UniqueIdProperty, RelationshipTo, db
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
-import requests
 
 app = Flask(__name__)
 app.config['JWT_SECRET_KEY'] = 'supersecretkey'
@@ -27,14 +26,13 @@ class Feedback(StructuredNode):
     surname = StringProperty(required=True)
     first_name = StringProperty(required=True)
     middle_name = StringProperty(required=True)
-    unit = StringProperty(required=True)
+    division = StringProperty(required=True)
     quarter = StringProperty(required=True)
     gist = StringProperty(required=True)
-    date = StringProperty(required=True)
+    incident_date = StringProperty(required=True)
     recommended = StringProperty(required=True)
     target_date = StringProperty(required=True)
     date_created = StringProperty(required=True)
-
 
 class Register(Resource):
     def post(self):
@@ -42,7 +40,7 @@ class Register(Resource):
         hushed_password = generate_password_hash(data['password'])
         try:
             user = User(username=data['username'], password=hushed_password).save()
-            return {'message': 'User Registered Successfully'}, 201
+            return {'message': 'User  Registered Successfully'}, 201
         except Exception as e:
             return {'error': str(e)}, 400
         
@@ -66,13 +64,91 @@ class Dashboard(Resource):
     @jwt_required()
     def get(self):
         current_user = get_jwt_identity()
-        return {'username': current_user}, 200
+        user = User.nodes.first_or_none(username=current_user)
+
+        if user:
+            feedback_list = user.gave_feedback.all()
+            feedback_data = []
+            for feedback in feedback_list:
+                feedback_data.append({
+                    'uid': feedback.uid,
+                    'surname': feedback.surname,
+                    'first_name': feedback.first_name,
+                    'middle_name': feedback.middle_name,
+                    'division': feedback.division,
+                    'quarter': feedback.quarter,
+                    'gist': feedback.gist,
+                    'incident_date': feedback.incident_date,
+                    'recommended': feedback.recommended,
+                    'target_date': feedback.target_date,
+                    'date_created': feedback.date_created
+                })
+            json = jsonify('feedback_data')
+            response = {'username': current_user, 'data': feedback_data}
+            # response.status_code = 200
+            return response
+        
+        return {'message': 'User  not found'}, 404
+
     
 class FeedbackForm(Resource):
     @jwt_required()
     def get(self):
         current_user = get_jwt_identity()
         return {'username': current_user}, 200
+
+class AddFeedback(Resource):
+    @jwt_required()
+    def post(self):
+        data = request.get_json()
+        current_user = get_jwt_identity()
+        user = User.nodes.first_or_none(username=current_user)
+
+        if user:
+            feedback = Feedback(
+                surname=data['surname'],
+                first_name=data['first_name'],
+                middle_name=data['middle_name'],
+                division=data['division'],
+                quarter=data['quarter'],
+                gist=data['gist'],
+                incident_date=data['incident_date'],
+                recommended=data['recommended'],
+                target_date=data['target_date'],
+                date_created=data['date_created']
+            ).save()
+            user.gave_feedback.connect(feedback)
+            return {'message': 'Feedback added successfully'}, 201
+        return {'message': 'User  not found'}, 404
+
+class GetFeedback(Resource):
+    @jwt_required()
+    def get(self, feedback_id):
+        current_user = get_jwt_identity()
+        user = User.nodes.first_or_none(username=current_user)
+
+        if user:
+            feedback = Feedback.nodes.get_or_none(uid=feedback_id)
+
+            if feedback and feedback in user.gave_feedback.all():
+                data = {
+                    'uid': feedback.uid,
+                    'surname': feedback.surname,
+                    'first_name': feedback.first_name,
+                    'middle_name': feedback.middle_name,
+                    'division': feedback.division,
+                    'quarter': feedback.quarter,
+                    'gist': feedback.gist,
+                    'incident_date': feedback.incident_date,
+                    'recommended': feedback.recommended,
+                    'target_date': feedback.target_date,
+                    'date_created': feedback.date_created}
+                return {'username': current_user, 'data': data}, 200
+            
+            return {'message': 'Feedback not found or does not belong to the user'}, 404
+        
+        return {'message': 'User  not found'}, 404
+
 
 @jwt.token_in_blocklist_loader
 def check_if_token_in_blacklist(jwt_header, jwt_payload):
@@ -81,9 +157,12 @@ def check_if_token_in_blacklist(jwt_header, jwt_payload):
 
 api.add_resource(Register, '/register')
 api.add_resource(Login, '/login')
-api.add_resource(Logout, '/logout')  # Add the logout resource
+api.add_resource(Logout, '/logout')
 api.add_resource(Dashboard, '/dashboard')
 api.add_resource(FeedbackForm, '/feedback-form')
+api.add_resource(AddFeedback, '/add-feedback')
+api.add_resource(GetFeedback, '/get-feedback/<feedback_id>')
+
 
 if __name__ == '__main__':
     app.run(port=4000, debug=True)
