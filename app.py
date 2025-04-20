@@ -148,6 +148,35 @@ class GetFeedback(Resource):
             return {'message': 'Feedback not found or does not belong to the user'}, 404
         
         return {'message': 'User  not found'}, 404
+    
+class UpdateFeedback(Resource):
+    @jwt_required()
+    def post(self, feedback_id):
+        data = request.get_json()
+        current_user = get_jwt_identity()
+        user = User.nodes.first_or_none(username=current_user)
+
+        if user:
+            feedback = Feedback.nodes.get_or_none(uid=feedback_id)
+
+            if feedback and feedback in user.gave_feedback.all():
+                feedback.surname = data.get('surname', feedback.surname)
+                feedback.first_name = data.get('first_name', feedback.first_name)
+                feedback.middle_name = data.get('middle_name', feedback.middle_name)
+                feedback.division = data.get('division', feedback.division)
+                feedback.quarter = data.get('quarter', feedback.quarter)
+                feedback.gist = data.get('gist', feedback.gist)
+                feedback.incident_date = data.get('incident_date', feedback.incident_date)
+                feedback.recommended = data.get('recommended', feedback.recommended)
+                feedback.target_date = data.get('target_date', feedback.target_date)
+                feedback.date_created = data.get('date_created', feedback.date_created)
+                feedback.save() 
+
+                return {'message': 'Feedback updated successfully'}, 200
+            
+            return {'message': 'Feedback not found or does not belong to the user'}, 404
+        
+        return {'message': 'User  not found'}, 404
 
 
 @jwt.token_in_blocklist_loader
@@ -162,6 +191,7 @@ api.add_resource(Dashboard, '/dashboard')
 api.add_resource(FeedbackForm, '/feedback-form')
 api.add_resource(AddFeedback, '/add-feedback')
 api.add_resource(GetFeedback, '/get-feedback/<feedback_id>')
+api.add_resource(UpdateFeedback, '/update-feedback/<feedback_id>')
 
 
 if __name__ == '__main__':

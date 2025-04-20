@@ -102,6 +102,27 @@ def getFeedback(feedback_id):
         if response.status_code == 200:
             return render_template('view-form.html', username=response.json().get('username'), data=response.json().get('data'))
         return redirect(url_for('dashboard'))
+    
+@client_app.route('/update-feedback/<feedback_id>', methods=['POST', 'GET'])
+def updateFeedback(feedback_id):
+    token = session.get('token')
+    if not token:
+        return redirect(url_for('login'))
+    if request.method == 'POST':
+        headers = {'Authorization': f'Bearer {token}'}
+        data = {'surname': request.form['surname'], 
+                'first_name': request.form['first_name'],
+                'middle_name': request.form['middle_name'],
+                'division': request.form['division'],
+                'quarter': request.form['quarter'],
+                'gist': request.form['gist'],
+                'incident_date': request.form['incident_date'],
+                'recommended': request.form['recommended'],
+                'target_date': request.form['target_date'],}
+        response = requests.post(f'{AUTH_SERVER}/update-feedback/{feedback_id}', headers=headers, json=data)
+        if response.status_code == 200:
+            return redirect(url_for('dashboard'))
+        return redirect(url_for('getFeedback', feedback_id=feedback_id))
 
 if __name__ == '__main__':
     client_app.run(port=4001, debug=True)
