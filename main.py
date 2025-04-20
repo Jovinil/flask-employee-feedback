@@ -43,7 +43,7 @@ def login():
 def logout():
     token = session.get('token')
     headers = {'Authorization': f'Bearer {token}'}
-    reponse = requests.get(f'{AUTH_SERVER}/logout', headers=headers)
+    reponse = requests.post(f'{AUTH_SERVER}/logout', headers=headers)
 
     session.pop('token', None)
     return redirect(url_for('login'))

@@ -2,15 +2,13 @@ from flask import Flask, request, jsonify
 from flask_restful import Api, Resource
 from neomodel import StructuredNode, StringProperty, UniqueIdProperty, RelationshipTo, db
 from werkzeug.security import generate_password_hash, check_password_hash
-from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
+from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity, get_jwt
 
 app = Flask(__name__)
 app.config['JWT_SECRET_KEY'] = 'supersecretkey'
 app.config['SECRET_KEY'] = 'anothersecretkey'
 api = Api(app)
 jwt = JWTManager(app)
-
-# Initialize a set to store blacklisted tokens
 blacklist = set()
 
 # db.set_connection('neo4j://neo4j:password@:localhost:7687/')
@@ -55,9 +53,9 @@ class Login(Resource):
     
 class Logout(Resource):
     @jwt_required()
-    def get(self):
-        jti = get_jwt()['jti']  # Get the unique identifier of the JWT
-        blacklist.add(jti)  # Add the token to the blacklist
+    def post(self):
+        jti = get_jwt()['jti']
+        blacklist.add(jti)
         return {'message': 'Successfully logged out'}, 200
 
 class Dashboard(Resource):
@@ -85,7 +83,6 @@ class Dashboard(Resource):
                 })
             json = jsonify('feedback_data')
             response = {'username': current_user, 'data': feedback_data}
-            # response.status_code = 200
             return response
         
         return {'message': 'User  not found'}, 404
